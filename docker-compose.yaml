@@ -1,4 +1,4 @@
-version: '3'
+version: '3.1'
 
 services:
     db:
@@ -9,4 +9,6 @@ services:
         environment:
             MONGODB_DATABSE: nest-pokemon
         volumes:
-            - ./mongo:/data/db
+            - ${PWD}/mongo:/data/db
+volumes:
+    mongo:
