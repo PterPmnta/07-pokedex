@@ -36,7 +36,6 @@ export class PokemonService {
 
     async findOne(term: string) {
         try {
-            let pokemon: Pokemon;
             let condition: object = { name: term.toLowerCase().trim() };
 
             if (!isNaN(+term)) condition = { nro: term };
@@ -44,7 +43,7 @@ export class PokemonService {
 
             console.log(condition);
 
-            pokemon = await this.pokemonModel.findOne(condition);
+            const pokemon = await this.pokemonModel.findOne(condition);
 
             if (!pokemon) {
                 throw new NotFoundException(
@@ -84,8 +83,15 @@ export class PokemonService {
         }
     }
 
-    remove(id: number) {
-        return `This action removes a #${id} pokemon`;
+    async remove(id: string) {
+        try {
+            const pokemon = await this.findOne(id);
+            await this.pokemonModel.deleteOne({ _id: pokemon._id });
+
+            return `This action removes a #${id} pokemon`;
+        } catch (error) {
+            throw new BadRequestException(error);
+        }
     }
 
     private handleExceptions(error: any) {

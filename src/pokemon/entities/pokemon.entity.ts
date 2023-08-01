@@ -13,7 +13,6 @@ export class Pokemon {
         index: true,
     })
     nro: number;
-    //url: string;
 }
 
 export const PokemonSchema = SchemaFactory.createForClass(Pokemon);
