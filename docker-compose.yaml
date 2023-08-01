@@ -9,6 +9,6 @@ services:
         environment:
             MONGODB_DATABSE: nest-pokemon
         volumes:
-            - ${PWD}/mongo:/data/db
+            - ./mongo:/data/db
 volumes:
     mongo:

@@ -49,21 +49,42 @@ export class PokemonService {
             if (!isNaN(+term)) condition = { nro: term };
             if (isValidObjectId(term)) condition = { _id: term };
 
+            console.log(condition);
+
+            pokemon = await this.pokemonModel.findOne(condition);
+
             if (!pokemon) {
                 throw new NotFoundException(
                     `Pokemon with id ${term} not found`,
                 );
             }
 
-            pokemon = await this.pokemonModel.findOne(condition);
             return pokemon;
         } catch (error) {
             throw new BadRequestException(error);
         }
     }
 
-    update(id: number, updatePokemonDto: UpdatePokemonDto) {
-        return `This action updates a #${id} pokemon`;
+    async update(term: string, updatePokemonDto: UpdatePokemonDto) {
+        await this.findOne(term);
+
+        if (updatePokemonDto.name) {
+            updatePokemonDto.name = updatePokemonDto.name.toLowerCase();
+        }
+
+        const pokemonUpdated = this.pokemonModel.findOneAndUpdate(
+            {
+                $or: [
+                    { nro: !isNaN(+term) ? +term : undefined },
+                    { _id: isValidObjectId(term) ? term : undefined },
+                    { name: term },
+                ],
+            },
+            { $set: updatePokemonDto },
+            { new: true },
+        );
+
+        return pokemonUpdated;
     }
 
     remove(id: number) {
