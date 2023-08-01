@@ -85,8 +85,7 @@ export class PokemonService {
 
     async remove(id: string) {
         try {
-            const pokemon = await this.findOne(id);
-            await this.pokemonModel.deleteOne({ _id: pokemon._id });
+            await this.pokemonModel.findByIdAndDelete(id);
 
             return `This action removes a #${id} pokemon`;
         } catch (error) {
