@@ -1,3 +1,4 @@
+import { AxiosAdapter } from '../common/adapters/axios.adapter';
 import { Pokemon } from './../pokemon/entities/pokemon.entity';
 import { Injectable } from '@nestjs/common';
 
@@ -6,6 +7,7 @@ import { catchError, firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { FetchAdapter } from '../common/adapters/fetch.adapter';
 
 export interface PokeapiResponse {
     count: number;
@@ -25,35 +27,32 @@ export class SeedService {
         private readonly httpService: HttpService,
         @InjectModel(Pokemon.name)
         private readonly pokemonModel: Model<Pokemon>,
+        private readonly axiosAdapter: AxiosAdapter,
+        private readonly fetchAdapter: FetchAdapter,
     ) {}
 
     async executeSeed() {
-        await this.pokemonModel.deleteMany({});
+        try {
+            await this.pokemonModel.deleteMany({});
 
-        const { data } = await firstValueFrom(
-            this.httpService
-                .get<PokeapiResponse>(
-                    'https://pokeapi.co/api/v2/pokemon?limit=650',
-                )
-                .pipe(
-                    catchError((error: AxiosError) => {
-                        console.error(error.response.data);
-                        throw error.response.data;
-                    }),
-                ),
-        );
+            const data = await this.axiosAdapter.get<PokeapiResponse>(
+                'https://pokeapi.co/api/v2/pokemon?limit=650',
+            );
 
-        const pokemonToInsert: { name: string; nro: number }[] = [];
+            const pokemonToInsert: { name: string; nro: number }[] = [];
 
-        data.results.forEach(({ name, url }) => {
-            const segments = url.split('/');
-            const nro: number = +segments[segments.length - 2];
+            data.results.forEach(({ name, url }) => {
+                const segments = url.split('/');
+                const nro: number = +segments[segments.length - 2];
 
-            pokemonToInsert.push({ name, nro });
-        });
+                pokemonToInsert.push({ name, nro });
+            });
 
-        await this.pokemonModel.insertMany(pokemonToInsert);
+            await this.pokemonModel.insertMany(pokemonToInsert);
 
-        return 'Seed executed';
+            return 'Seed executed';
+        } catch (error) {
+            throw new Error('This is an error - check logs');
+        }
     }
 }
