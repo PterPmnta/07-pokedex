@@ -1,3 +1,4 @@
+import { PaginationDto } from './../common/dto/pagination.dto';
 import {
     BadRequestException,
     Injectable,
@@ -30,7 +31,7 @@ export class PokemonService {
         }
     }
 
-    async findAll() {
+    async findAll(paginationDto: PaginationDto) {
         return this.pokemonModel.find();
     }
 
