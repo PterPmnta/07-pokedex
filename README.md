@@ -43,7 +43,13 @@ npm i -g @nestjs/cli
 docker-compose up -d
 ```
 
-5. Ejecutar para alimentar la base de datos
+5. Clonar el archivo **.env.template** y renombrar la copia **.env**
+
+6. Llenar las variables de entorno definidas
+
+7. Ejecutar las aplicacion en dev con el comando `yarn star:dev`
+
+8. Ejecutar para alimentar la base de datos
 
 ```
 http://localhost:3000/api/v2/seed
